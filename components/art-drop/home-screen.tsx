@@ -124,7 +124,7 @@ export function HomeScreen() {
             {displayedReels.map((reel, index) => (
               <button
                 key={reel.id}
-                onClick={() => router.push(`/feed?index=${index}`)}
+                onClick={() => router.push(`/feed?id=${reel.id}`)}
                 className="group relative flex flex-col gap-2 text-left"
               >
                 {/* Thumbnail */}

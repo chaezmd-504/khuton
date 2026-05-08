@@ -12,8 +12,7 @@ type Tab = "home" | "feed" | "subscription" | "my"
 function FeedContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const raw = searchParams.get("index")
-  const initialIndex = raw !== null && !isNaN(Number(raw)) ? Number(raw) : 0
+  const raw = searchParams.get("id")
 
   const [artistId, setArtistId] = useState<string | null>(null)
   const [dmArtistId, setDmArtistId] = useState<string | null>(null)
@@ -39,7 +38,7 @@ function FeedContent() {
           />
         ) : (
           <FeedScreen
-            initialIndex={initialIndex}
+            initialReelId={raw ?? undefined}
             onArtistClick={(id) => setArtistId(id)}
             onOpenDM={(id) => setDmArtistId(id)}
           />

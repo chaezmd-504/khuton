@@ -33,14 +33,7 @@ export function getRecommendedReels(preferences: Category[], allReels: Reel[]): 
     .sort((a, b) => b.score - a.score)
     .map(({ reel }) => reel)
 
-  const total = allReels.length
-  const preferredCount = Math.ceil(total * 0.75)
-  const nonPreferredCount = total - preferredCount
-
-  return [
-    ...preferred.slice(0, preferredCount),
-    ...nonPreferred.slice(0, nonPreferredCount),
-  ]
+  return [...preferred, ...nonPreferred]
 }
 
 export function getPreferenceLabel(preferences: Category[]): string {

@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
-import { REELS } from "@/lib/mock-data"
+import { REELS, type Category } from "@/lib/mock-data"
+import { getRecommendedReels } from "@/lib/recommendation"
 import { useCoinStore } from "@/store/coin-store"
 import { useArchiveStore } from "@/store/archive-store"
 
@@ -51,16 +52,35 @@ const DROP_AMOUNTS = [
 // ── Component ─────────────────────────────────────────────────────────────────
 
 interface FeedScreenProps {
-  initialIndex?: number
+  initialReelId?: string
   onArtistClick?: (artistId: string) => void
   onOpenDM?: (artistId: string) => void
 }
 
-export function FeedScreen({ initialIndex = 0, onArtistClick, onOpenDM }: FeedScreenProps) {
-  const safeIndex = initialIndex >= 0 && initialIndex < REELS.length ? initialIndex : 0
+export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScreenProps) {
+  const [sortedReels, setSortedReels] = useState(REELS)
+
+  useEffect(() => {
+    const raw = localStorage.getItem("art-drop-preferences")
+    let prefs: Category[] = []
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) prefs = parsed as Category[]
+      } catch {}
+    }
+    const recommended = getRecommendedReels(prefs, REELS)
+    setSortedReels(recommended)
+  }, [])
 
   // ── navigation state ──
-  const [currentIndex, setCurrentIndex]   = useState(safeIndex)
+  const [currentIndex, setCurrentIndex]   = useState(0)
+
+  useEffect(() => {
+    if (!initialReelId) return
+    const idx = sortedReels.findIndex((r) => r.id === initialReelId)
+    if (idx >= 0) setCurrentIndex(idx)
+  }, [sortedReels, initialReelId])
   const [touchStartY, setTouchStartY]     = useState(0)
   const [expandedDesc, setExpandedDesc]   = useState(false)
 
@@ -84,7 +104,7 @@ export function FeedScreen({ initialIndex = 0, onArtistClick, onOpenDM }: FeedSc
   const { balance, deductCoin, addDroppedReel } = useCoinStore()
   const { toggleArchive, isArchived } = useArchiveStore()
 
-  const reel            = REELS[currentIndex]
+  const reel            = sortedReels[currentIndex] ?? sortedReels[0]
   const effectiveProgress = fundingOverrides[reel.id] ?? reel.fundingProgress
   const effectiveDrop   = isCustomAmount ? Number(customAmount) || 0 : selectedAmount ?? 0
 
@@ -103,7 +123,7 @@ export function FeedScreen({ initialIndex = 0, onArtistClick, onOpenDM }: FeedSc
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     const touchEndY = e.changedTouches[0].clientY
-    if (touchStartY - touchEndY > 50 && currentIndex < REELS.length - 1) {
+    if (touchStartY - touchEndY > 50 && currentIndex < sortedReels.length - 1) {
       setCurrentIndex((prev) => prev + 1)
       setExpandedDesc(false)
     } else if (touchEndY - touchStartY > 50 && currentIndex > 0) {
@@ -116,7 +136,7 @@ export function FeedScreen({ initialIndex = 0, onArtistClick, onOpenDM }: FeedSc
     if (wheelCooldown.current) return
     const next =
       e.deltaY > 0
-        ? Math.min(currentIndex + 1, REELS.length - 1)
+        ? Math.min(currentIndex + 1, sortedReels.length - 1)
         : Math.max(currentIndex - 1, 0)
     if (next === currentIndex) return
     setCurrentIndex(next)
@@ -154,7 +174,7 @@ export function FeedScreen({ initialIndex = 0, onArtistClick, onOpenDM }: FeedSc
   }
 
   const handleSpread = async () => {
-    const url = `${window.location.origin}/feed?index=${currentIndex}`
+    const url = `${window.location.origin}/feed?id=${reel.id}`
     setSpreadIds((prev) => { const n = new Set(prev); n.add(reel.id); return n })
     if (typeof navigator !== "undefined" && navigator.share) {
       try { await navigator.share({ title: reel.title, url }) } catch { /* cancelled */ }
