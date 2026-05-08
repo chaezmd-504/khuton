@@ -18,7 +18,7 @@ interface CoinStore {
 }
 
 export const useCoinStore = create<CoinStore>((set, get) => ({
-  balance: 12500,
+  balance: 20000,
   totalSpent: 0,
   dropCount: 0,
   droppedReels: [],
