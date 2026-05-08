@@ -28,8 +28,8 @@ function FeedContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[375px] mx-auto relative min-h-screen shadow-2xl shadow-black/50">
+    <div className="min-h-screen bg-gray-200">
+      <div className="max-w-[375px] mx-auto relative min-h-screen bg-background shadow-2xl shadow-black/30">
         {artistId ? (
           <ArtistProfileScreen
             artistId={artistId}

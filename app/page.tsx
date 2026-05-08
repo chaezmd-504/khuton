@@ -16,6 +16,11 @@ export default function ArtDropApp() {
   const router = useRouter()
 
   useEffect(() => {
+    const user = localStorage.getItem("art-drop-user")
+    if (!user) {
+      router.push("/login")
+      return
+    }
     const raw = localStorage.getItem("art-drop-preferences")
     if (!raw) {
       router.push("/onboarding")
@@ -62,9 +67,9 @@ export default function ArtDropApp() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-200">
       {/* Mobile container - centered on desktop */}
-      <div className="max-w-[375px] mx-auto relative min-h-screen shadow-2xl shadow-black/50">
+      <div className="max-w-[375px] mx-auto relative min-h-screen bg-background shadow-2xl shadow-black/30">
         {/* Artist profile screen overlay */}
         {selectedArtistId ? (
           <ArtistProfileScreen

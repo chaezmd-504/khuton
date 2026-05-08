@@ -235,13 +235,13 @@ export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScree
   // ── render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="absolute inset-0 bottom-16 bg-black">
+    <div className="absolute inset-0 bottom-14 bg-black">
 
       {/* Coin chip ─ z-50 */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-        <div className="glass rounded-full px-4 py-1.5 flex items-center gap-1.5">
-          <span className="text-lg">💰</span>
-          <span className="text-white font-semibold text-sm">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+        <div className="glass rounded-full px-3 py-1 flex items-center gap-1">
+          <span className="text-sm">💰</span>
+          <span className="font-semibold text-xs" style={{ color: "white" }}>
             {balance.toLocaleString()} C
           </span>
         </div>
@@ -255,64 +255,73 @@ export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScree
         onWheel={handleWheel}
       >
 
-        {/* YouTube iframe — key forces remount on swipe */}
+        {/* YouTube iframe — extended 80px beyond top/bottom, clipped by parent overflow-hidden */}
         <iframe
           key={currentIndex}
           src={`https://www.youtube.com/embed/${reel.videoId}?autoplay=1&mute=1&loop=1&controls=0&playlist=${reel.videoId}&rel=0&playsinline=1`}
-          className="absolute inset-0 w-full h-full"
           allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
-          style={{ border: "none", pointerEvents: "none" }}
+          style={{
+            position: "absolute",
+            top: "-80px",
+            left: 0,
+            width: "100%",
+            height: "calc(100% + 160px)",
+            border: "none",
+            pointerEvents: "none",
+          }}
         />
 
         {/* Gradient overlay ─ pointer-events-none so touch falls through */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/60 pointer-events-none" />
 
         {/* Touch-capture layer — transparent, prevents iframe from stealing events */}
         <div className="absolute inset-0 z-10" />
 
         {/* ── Right action bar ─ z-20 ── */}
-        <div className="absolute right-3 bottom-4 z-20 flex flex-col items-center gap-4">
+        <div className="absolute right-3 bottom-4 z-20 flex flex-col items-center gap-3">
 
           {/* Drop */}
-          <button onClick={(e) => { e.stopPropagation(); handleDropButtonClick() }} className="flex flex-col items-center gap-1">
-            <div className={cn("w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center icon-shadow transition-transform", dropAnimation && "animate-drop-burst")}>
-              <DropIcon className="w-7 h-7 text-white" />
+          <button onClick={(e) => { e.stopPropagation(); handleDropButtonClick() }} className="flex flex-col items-center gap-0.5">
+            <div className={cn("w-9 h-9 rounded-full bg-primary/90 flex items-center justify-center icon-shadow transition-transform", dropAnimation && "animate-drop-burst")}>
+              <DropIcon className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xs text-white font-medium text-shadow">Drop</span>
+            <span className="text-[9px] font-medium text-shadow" style={{ color: "white" }}>Drop</span>
           </button>
 
           {/* Connect */}
-          <button onClick={(e) => { e.stopPropagation(); onOpenDM?.(reel.artist.handle) }} className="flex flex-col items-center gap-1">
-            <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center icon-shadow">
-              <PaletteIcon className="w-6 h-6 text-white" />
+          <button onClick={(e) => { e.stopPropagation(); onOpenDM?.(reel.artist.handle) }} className="flex flex-col items-center gap-0.5">
+            <div className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center icon-shadow">
+              <PaletteIcon className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xs text-white font-medium text-shadow">Connect</span>
+            <span className="text-[9px] font-medium text-shadow" style={{ color: "white" }}>Connect</span>
           </button>
 
           {/* Spread */}
-          <button onClick={(e) => { e.stopPropagation(); handleSpread() }} className="flex flex-col items-center gap-1">
-            <div className={cn("w-12 h-12 rounded-full flex items-center justify-center icon-shadow transition-colors", spreadIds.has(reel.id) ? "bg-primary/90" : "bg-white/10 backdrop-blur-sm")}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white">
-                <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          <button onClick={(e) => { e.stopPropagation(); handleSpread() }} className="flex flex-col items-center gap-0.5">
+            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center icon-shadow transition-colors", spreadIds.has(reel.id) ? "bg-primary/90" : "bg-white/10 backdrop-blur-sm")}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white">
+                <path d="M7 3C3 7.5 3 16.5 7 21" />
+                <line x1="7" y1="3" x2="7" y2="21" strokeWidth="1.5" />
+                <line x1="7" y1="12" x2="19" y2="12" />
+                <path d="M15 8.5L19 12l-4 3.5" />
               </svg>
             </div>
-            <span className="text-xs text-white font-medium text-shadow">Spread</span>
+            <span className="text-[9px] font-medium text-shadow" style={{ color: "white" }}>Spread</span>
           </button>
 
           {/* Archive */}
-          <button onClick={(e) => { e.stopPropagation(); handleArchive() }} className="flex flex-col items-center gap-1">
-            <div className={cn("w-12 h-12 rounded-full flex items-center justify-center icon-shadow transition-colors", isArchived(reel.id) ? "bg-secondary/90" : "bg-white/10 backdrop-blur-sm")}>
-              <FrameIcon className="w-6 h-6 text-white" filled={isArchived(reel.id)} />
+          <button onClick={(e) => { e.stopPropagation(); handleArchive() }} className="flex flex-col items-center gap-0.5">
+            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center icon-shadow transition-colors", isArchived(reel.id) ? "bg-secondary/90" : "bg-white/10 backdrop-blur-sm")}>
+              <FrameIcon className="w-5 h-5 text-white" filled={isArchived(reel.id)} />
             </div>
-            <span className="text-xs text-white font-medium text-shadow">Archive</span>
+            <span className="text-[9px] font-medium text-shadow" style={{ color: "white" }}>Archive</span>
           </button>
 
           {/* More */}
-          <button onClick={(e) => { e.stopPropagation(); setShowPreferenceMenu(true) }} className="flex flex-col items-center gap-1">
-            <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center icon-shadow">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-white">
+          <button onClick={(e) => { e.stopPropagation(); setShowPreferenceMenu(true) }} className="flex flex-col items-center gap-0.5">
+            <div className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center icon-shadow">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
                 <circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="6" r="1.5" /><circle cx="12" cy="18" r="1.5" />
               </svg>
             </div>
@@ -324,8 +333,8 @@ export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScree
           {/* Funding bar */}
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-white/80 text-shadow">현재 {Math.round(effectiveProgress)}% 달성 중</span>
-              <span className="text-xs text-white/60 text-shadow">{reel.fundingGoal.toLocaleString()}C</span>
+              <span className="text-[10px] text-shadow" style={{ color: "rgba(255,255,255,0.8)" }}>현재 {Math.round(effectiveProgress)}% 달성 중</span>
+              <span className="text-[10px] text-shadow" style={{ color: "rgba(255,255,255,0.6)" }}>{reel.fundingGoal.toLocaleString()}C</span>
             </div>
             <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
               <div
@@ -336,22 +345,25 @@ export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScree
           </div>
 
           {/* Artist info */}
-          <button onClick={(e) => { e.stopPropagation(); onArtistClick?.(reel.artist.handle) }} className="flex items-center gap-2 mb-1">
-            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-muted ring-2 ring-white/30 flex-shrink-0">
+          <button onClick={(e) => { e.stopPropagation(); onArtistClick?.(reel.artist.handle) }} className="flex items-center gap-1.5 mb-1">
+            <div className="relative w-6 h-6 rounded-full overflow-hidden bg-muted ring-1 ring-white/30 flex-shrink-0">
               <Image src={reel.artist.avatarUrl} alt={reel.artist.name} fill className="object-cover" unoptimized />
             </div>
-            <p className="text-white font-bold text-base text-shadow">{reel.artist.handle}</p>
-            <span className="text-white/60">·</span>
-            <p className="text-white font-semibold text-sm text-shadow truncate">{reel.title}</p>
+            <p className="font-semibold text-xs text-shadow" style={{ color: "white" }}>{reel.artist.handle}</p>
+            <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>·</span>
+            <p className="text-xs text-shadow truncate" style={{ color: "rgba(255,255,255,0.9)" }}>{reel.title}</p>
           </button>
 
           {/* Description */}
           <div onClick={(e) => { e.stopPropagation(); setExpandedDesc((v) => !v) }}>
-            <p className={cn("text-white/80 text-sm text-shadow", expandedDesc ? "" : "line-clamp-1")}>
+            <p
+              className={cn("text-xs text-shadow leading-relaxed", expandedDesc ? "" : "line-clamp-1")}
+              style={{ color: "white" }}
+            >
               {reel.description}
             </p>
             {!expandedDesc && reel.description.length > 30 && (
-              <span className="text-white/60 text-sm mt-0.5">더 보기</span>
+              <span className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.75)" }}>더 보기</span>
             )}
           </div>
         </div>

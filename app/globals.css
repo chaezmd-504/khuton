@@ -4,71 +4,70 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Art-Drop Dark Theme - Always dark for immersive video experience */
-  --background: oklch(0.05 0 0);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.12 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.12 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  
-  /* Primary - Purple (artistic) */
-  --primary: oklch(0.55 0.24 285);
-  --primary-foreground: oklch(0.98 0 0);
-  
-  /* Secondary - Gold (coin/funding) */
+  /* Art-Drop Light Theme */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.1 0 0);
+  --card: oklch(0.97 0 0);
+  --card-foreground: oklch(0.1 0 0);
+  --popover: oklch(0.97 0 0);
+  --popover-foreground: oklch(0.1 0 0);
+
+  /* Primary - Baby Pink */
+  --primary: oklch(0.84 0.07 3);
+  --primary-foreground: oklch(0.12 0 0);
+
+  /* Secondary - Gold (coin/funding) - unchanged */
   --secondary: oklch(0.75 0.18 85);
   --secondary-foreground: oklch(0.12 0 0);
-  
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.55 0.24 285);
-  --accent-foreground: oklch(0.98 0 0);
+
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.46 0 0);
+  --accent: oklch(0.84 0.07 3);
+  --accent-foreground: oklch(0.12 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.25 0 0);
-  --ring: oklch(0.55 0.24 285);
-  
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.88 0 0);
+  --ring: oklch(0.84 0.07 3);
+
   /* Chart colors */
-  --chart-1: oklch(0.55 0.24 285);
+  --chart-1: oklch(0.84 0.07 3);
   --chart-2: oklch(0.75 0.18 85);
   --chart-3: oklch(0.6 0.2 160);
   --chart-4: oklch(0.7 0.15 30);
   --chart-5: oklch(0.65 0.2 200);
-  
+
   --radius: 0.75rem;
-  
-  /* Glass effect */
+
+  /* Glass effect - for use on dark video backgrounds */
   --glass-bg: oklch(1 0 0 / 0.1);
   --glass-border: oklch(1 0 0 / 0.2);
-  
-  /* Surface for cards */
-  --surface: oklch(0.12 0 0);
-  --surface-foreground: oklch(0.98 0 0);
+
+  --surface: oklch(0.97 0 0);
+  --surface-foreground: oklch(0.1 0 0);
 }
 
 .dark {
-  --background: oklch(0.05 0 0);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.12 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.12 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.55 0.24 285);
-  --primary-foreground: oklch(0.98 0 0);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.1 0 0);
+  --card: oklch(0.97 0 0);
+  --card-foreground: oklch(0.1 0 0);
+  --popover: oklch(0.97 0 0);
+  --popover-foreground: oklch(0.1 0 0);
+  --primary: oklch(0.84 0.07 3);
+  --primary-foreground: oklch(0.12 0 0);
   --secondary: oklch(0.75 0.18 85);
   --secondary-foreground: oklch(0.12 0 0);
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.55 0.24 285);
-  --accent-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.46 0 0);
+  --accent: oklch(0.84 0.07 3);
+  --accent-foreground: oklch(0.12 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.25 0 0);
-  --ring: oklch(0.55 0.24 285);
-  --chart-1: oklch(0.55 0.24 285);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.88 0 0);
+  --ring: oklch(0.84 0.07 3);
+  --chart-1: oklch(0.84 0.07 3);
   --chart-2: oklch(0.75 0.18 85);
   --chart-3: oklch(0.6 0.2 160);
   --chart-4: oklch(0.7 0.15 30);
@@ -152,6 +151,11 @@
   
   .safe-top {
     padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* Baby pink gradient for primary CTAs */
+  .bg-pink-gradient {
+    background: linear-gradient(135deg, #FFB6C1 0%, #FF9EB5 100%);
   }
 }
 

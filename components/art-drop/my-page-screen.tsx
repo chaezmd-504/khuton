@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronRight, Coins, Award, Bookmark, ShoppingBag } from "lucide-react"
+import { ChevronRight, Coins, Award } from "lucide-react"
 import Image from "next/image"
 import { CoinChargeSheet } from "./coin-charge-sheet"
 import { GalleryScreen } from "./gallery-screen"
@@ -77,17 +77,20 @@ export function MyPageScreen() {
           {/* Stats */}
           <div className="mt-6 w-full grid grid-cols-3 gap-4">
             <div className="flex flex-col items-center p-3 rounded-xl bg-card">
-              <p className="text-2xl font-bold text-primary">{dropCount}</p>
+              <p className="text-xl font-bold text-primary">{dropCount}</p>
               <p className="text-xs text-muted-foreground mt-1">후원한 작품</p>
             </div>
             <div className="flex flex-col items-center p-3 rounded-xl bg-card">
-              <p className="text-lg font-bold text-secondary leading-tight">{totalSpent.toLocaleString()}</p>
+              <p className="text-xl font-bold text-secondary leading-tight">{totalSpent.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground mt-1">C 누적 후원</p>
             </div>
-            <div className="flex flex-col items-center p-3 rounded-xl bg-card">
-              <p className="text-2xl font-bold text-foreground">{archivedIds.size}</p>
-              <p className="text-xs text-muted-foreground mt-1">소장 작품</p>
-            </div>
+            <button
+              onClick={() => setShowOrderHistory(true)}
+              className="flex flex-col items-center p-3 rounded-xl bg-card active:opacity-70 transition-opacity"
+            >
+              <p className="text-xl font-bold text-foreground">{orders.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">주문 내역</p>
+            </button>
           </div>
         </div>
 
@@ -153,7 +156,10 @@ export function MyPageScreen() {
             className="w-full flex items-center gap-4 p-4 rounded-2xl bg-card hover:bg-card/80 transition-colors"
           >
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-              <Bookmark className="w-6 h-6 text-foreground" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-foreground">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <rect x="6" y="6" width="12" height="12" rx="1" />
+              </svg>
             </div>
             <div className="flex-1 text-left">
               <p className="font-semibold text-foreground">저장한 작품</p>
@@ -167,27 +173,6 @@ export function MyPageScreen() {
             </div>
           </button>
 
-          {/* Order history */}
-          <button
-            onClick={() => setShowOrderHistory(true)}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-card hover:bg-card/80 transition-colors"
-          >
-            <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-amber-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="font-semibold text-foreground">주문 내역</p>
-              <p className="text-sm text-muted-foreground">상품 구매 내역 및 배송 현황</p>
-            </div>
-            <div className="flex items-center gap-2">
-              {orders.length > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-xs font-semibold">
-                  {orders.length}
-                </span>
-              )}
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-          </button>
         </div>
       </main>
 
