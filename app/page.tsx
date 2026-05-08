@@ -32,22 +32,12 @@ export default function ArtDropApp() {
   }, [router])
 
   const [activeTab, setActiveTab] = useState<TabType>("home")
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
   const [coins, setCoins] = useState(12500)
   const [selectedArtistId, setSelectedArtistId] = useState<string | null>(null)
   const [dmArtistId, setDmArtistId] = useState<string | null>(null)
 
-  const handleVideoClick = (videoId: string) => {
-    setSelectedVideoId(videoId)
-    setActiveTab("feed")
-  }
-
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab)
-    if (tab !== "feed") {
-      setSelectedVideoId(null)
-    }
-    // Clear artist profile when changing tabs
     setSelectedArtistId(null)
   }
 
@@ -86,12 +76,11 @@ export default function ArtDropApp() {
         ) : (
           <>
             {activeTab === "home" && (
-              <HomeScreen onVideoClick={handleVideoClick} />
+              <HomeScreen />
             )}
             
             {activeTab === "feed" && (
               <FeedScreen
-                initialVideoId={selectedVideoId || undefined}
                 coins={coins}
                 onCoinsChange={setCoins}
                 onArtistClick={handleArtistClick}
