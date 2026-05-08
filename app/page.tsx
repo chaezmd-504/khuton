@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { BottomNav } from "@/components/art-drop/bottom-nav"
 import { HomeScreen } from "@/components/art-drop/home-screen"
 import { FeedScreen } from "@/components/art-drop/feed-screen"
@@ -12,6 +13,24 @@ import { DMChatScreen } from "@/components/art-drop/dm-chat-screen"
 type TabType = "home" | "feed" | "subscription" | "my"
 
 export default function ArtDropApp() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const raw = localStorage.getItem("art-drop-preferences")
+    if (!raw) {
+      router.push("/onboarding")
+      return
+    }
+    try {
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        router.push("/onboarding")
+      }
+    } catch {
+      router.push("/onboarding")
+    }
+  }, [router])
+
   const [activeTab, setActiveTab] = useState<TabType>("home")
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
   const [coins, setCoins] = useState(12500)
