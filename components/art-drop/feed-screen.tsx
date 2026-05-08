@@ -4,10 +4,12 @@ import { useState, useRef, useEffect } from "react"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
-import { REELS, type Category } from "@/lib/mock-data"
+import { REELS, PRODUCTS, type Category, type Product } from "@/lib/mock-data"
 import { getRecommendedReels } from "@/lib/recommendation"
 import { useCoinStore } from "@/store/coin-store"
 import { useArchiveStore } from "@/store/archive-store"
+import { useOrderStore } from "@/store/order-store"
+import { DeliveryModal } from "./delivery-modal"
 
 // ── SVG icon components ──────────────────────────────────────────────────────
 
@@ -100,9 +102,21 @@ export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScree
   // ── toast ──
   const [toast, setToast] = useState<string | null>(null)
 
+  // ── drop sheet tab ──
+  const [activeDropTab, setActiveDropTab] = useState<"donate" | "shop">("donate")
+
+  // ── delivery modal ──
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false)
+  const [pendingPurchase, setPendingPurchase] = useState<{
+    orderId: string
+    productName: string
+    artistName: string
+  } | null>(null)
+
   // ── stores ──
   const { balance, deductCoin, addDroppedReel } = useCoinStore()
   const { toggleArchive, isArchived } = useArchiveStore()
+  const { addOrder } = useOrderStore()
 
   const reel            = sortedReels[currentIndex] ?? sortedReels[0]
   const effectiveProgress = fundingOverrides[reel.id] ?? reel.fundingProgress
@@ -150,7 +164,35 @@ export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScree
   const handleDropButtonClick = () => {
     setDropAnimation(true)
     setTimeout(() => setDropAnimation(false), 500)
+    setActiveDropTab("donate")
     setShowDropSheet(true)
+  }
+
+  const handlePurchase = (product: Product) => {
+    const success = deductCoin(product.price)
+    if (!success) {
+      showToast("코인이 부족해요 💰")
+      return
+    }
+    const orderId = addOrder({
+      productId: product.id,
+      reelId: reel.id,
+      productName: product.name,
+      artistName: reel.artist.name,
+      price: product.price,
+      imageUrl: product.imageUrl,
+    })
+    setShowDropSheet(false)
+    setPendingPurchase({ orderId, productName: product.name, artistName: reel.artist.name })
+    setShowDeliveryModal(true)
+    showToast("구매 완료! 📦 배송 정보를 입력해주세요")
+  }
+
+  const TYPE_LABEL: Record<Product["type"], { label: string; color: string }> = {
+    print:    { label: "프린트",   color: "bg-blue-500/20 text-blue-500" },
+    original: { label: "원본작품", color: "bg-purple-500/20 text-purple-500" },
+    goods:    { label: "굿즈",     color: "bg-green-500/20 text-green-600" },
+    class:    { label: "클래스",   color: "bg-orange-500/20 text-orange-500" },
   }
 
   const handleDrop = () => {
@@ -369,6 +411,16 @@ export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScree
         </>
       )}
 
+      {/* ── Delivery Modal ── */}
+      {showDeliveryModal && pendingPurchase && (
+        <DeliveryModal
+          orderId={pendingPurchase.orderId}
+          productName={pendingPurchase.productName}
+          artistName={pendingPurchase.artistName}
+          onClose={() => { setShowDeliveryModal(false); setPendingPurchase(null) }}
+        />
+      )}
+
       {/* ── Drop Bottom Sheet ── */}
       {showDropSheet && (
         <>
@@ -376,90 +428,162 @@ export function FeedScreen({ initialReelId, onArtistClick, onOpenDM }: FeedScree
           <div className="absolute bottom-0 left-0 right-0 z-50 animate-slide-up">
             <div className="max-w-[375px] mx-auto bg-card rounded-t-3xl overflow-hidden">
               {/* Sheet header */}
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <h2 className="text-lg font-bold text-foreground">후원하기 — Drop</h2>
+              <div className="flex items-center justify-between p-4 pb-0">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden bg-muted flex-shrink-0">
+                    <Image src={reel.artist.avatarUrl} alt={reel.artist.name} fill className="object-cover" unoptimized />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground text-sm">{reel.artist.name}</p>
+                    <p className="text-xs text-muted-foreground">{Math.round(effectiveProgress)}% 달성 중</p>
+                  </div>
+                </div>
                 <button onClick={() => setShowDropSheet(false)} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              {/* Artist summary */}
-              <div className="p-4 flex items-center gap-3">
-                <div className="relative w-12 h-12 rounded-full overflow-hidden bg-muted flex-shrink-0">
-                  <Image src={reel.artist.avatarUrl} alt={reel.artist.name} fill className="object-cover" unoptimized />
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-foreground">{reel.artist.name}</p>
-                  <p className="text-sm text-muted-foreground">{reel.artist.handle}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-muted-foreground">달성률</p>
-                  <p className="font-bold text-primary">{Math.round(effectiveProgress)}%</p>
-                </div>
-              </div>
-
-              {/* Amount chips */}
-              <div className="px-4 pb-4">
-                <p className="text-sm text-muted-foreground mb-3">후원 금액 선택</p>
-                <div className="grid grid-cols-4 gap-2">
-                  {DROP_AMOUNTS.map((a) => (
-                    <button
-                      key={a.value}
-                      onClick={() => { setSelectedAmount(a.value); setIsCustomAmount(false); setCustomAmount("") }}
-                      className={cn(
-                        "h-12 rounded-xl font-semibold text-sm transition-all",
-                        selectedAmount === a.value && !isCustomAmount
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-foreground hover:bg-muted/80"
-                      )}
-                    >
-                      {a.label}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => { setIsCustomAmount(true); setSelectedAmount(null) }}
-                    className={cn(
-                      "h-12 rounded-xl font-semibold text-sm transition-all",
-                      isCustomAmount ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-muted/80"
-                    )}
-                  >
-                    직접입력
-                  </button>
-                </div>
-                {isCustomAmount && (
-                  <div className="mt-3 relative">
-                    <input
-                      type="number"
-                      value={customAmount}
-                      onChange={(e) => setCustomAmount(e.target.value)}
-                      placeholder="금액 입력"
-                      autoFocus
-                      className="w-full h-12 px-4 pr-12 rounded-xl bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">C</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Footer */}
-              <div className="p-4 bg-muted/50 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">보유 코인</span>
-                  <span className="font-semibold text-foreground">{balance.toLocaleString()} C</span>
-                </div>
+              {/* Tabs */}
+              <div className="flex border-b border-border mt-3 px-4">
                 <button
-                  onClick={handleDrop}
-                  disabled={effectiveDrop <= 0}
+                  onClick={() => setActiveDropTab("donate")}
                   className={cn(
-                    "w-full h-14 rounded-full font-bold text-lg transition-all",
-                    effectiveDrop > 0
-                      ? "bg-primary text-primary-foreground hover:opacity-90"
-                      : "bg-muted text-muted-foreground cursor-not-allowed"
+                    "flex-1 pb-2.5 text-sm font-semibold transition-colors",
+                    activeDropTab === "donate"
+                      ? "border-b-2 border-primary text-primary"
+                      : "text-muted-foreground"
                   )}
                 >
-                  Drop!
+                  후원
+                </button>
+                <button
+                  onClick={() => setActiveDropTab("shop")}
+                  className={cn(
+                    "flex-1 pb-2.5 text-sm font-semibold transition-colors",
+                    activeDropTab === "shop"
+                      ? "border-b-2 border-primary text-primary"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  상품구매
                 </button>
               </div>
+
+              {/* 후원 탭 */}
+              {activeDropTab === "donate" && (
+                <>
+                  <div className="px-4 pt-4 pb-4">
+                    <p className="text-sm text-muted-foreground mb-3">후원 금액 선택</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {DROP_AMOUNTS.map((a) => (
+                        <button
+                          key={a.value}
+                          onClick={() => { setSelectedAmount(a.value); setIsCustomAmount(false); setCustomAmount("") }}
+                          className={cn(
+                            "h-12 rounded-xl font-semibold text-sm transition-all",
+                            selectedAmount === a.value && !isCustomAmount
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-foreground hover:bg-muted/80"
+                          )}
+                        >
+                          {a.label}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => { setIsCustomAmount(true); setSelectedAmount(null) }}
+                        className={cn(
+                          "h-12 rounded-xl font-semibold text-sm transition-all",
+                          isCustomAmount ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-muted/80"
+                        )}
+                      >
+                        직접입력
+                      </button>
+                    </div>
+                    {isCustomAmount && (
+                      <div className="mt-3 relative">
+                        <input
+                          type="number"
+                          value={customAmount}
+                          onChange={(e) => setCustomAmount(e.target.value)}
+                          placeholder="금액 입력"
+                          autoFocus
+                          className="w-full h-12 px-4 pr-12 rounded-xl bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">C</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 bg-muted/50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">보유 코인</span>
+                      <span className="font-semibold text-foreground">{balance.toLocaleString()} C</span>
+                    </div>
+                    <button
+                      onClick={handleDrop}
+                      disabled={effectiveDrop <= 0}
+                      className={cn(
+                        "w-full h-14 rounded-full font-bold text-lg transition-all",
+                        effectiveDrop > 0
+                          ? "bg-primary text-primary-foreground hover:opacity-90"
+                          : "bg-muted text-muted-foreground cursor-not-allowed"
+                      )}
+                    >
+                      Drop!
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* 상품구매 탭 */}
+              {activeDropTab === "shop" && (
+                <div className="px-4 pt-4 pb-6">
+                  {PRODUCTS.filter((p) => p.reelId === reel.id).length === 0 ? (
+                    <div className="py-10 text-center">
+                      <p className="text-muted-foreground text-sm">등록된 상품이 없어요</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {PRODUCTS.filter((p) => p.reelId === reel.id).map((product) => {
+                        const typeInfo = TYPE_LABEL[product.type]
+                        return (
+                          <div key={product.id} className="flex gap-3 p-3 rounded-xl bg-muted">
+                            <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-background">
+                              <Image src={product.imageUrl} alt={product.name} fill className="object-cover" unoptimized />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <p className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{product.name}</p>
+                                <span className={cn("px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0", typeInfo.color)}>
+                                  {typeInfo.label}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{product.description}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <div>
+                                  <span className="font-bold text-sm" style={{ color: "#F59E0B" }}>
+                                    {product.price.toLocaleString()} C
+                                  </span>
+                                  <span className="text-xs text-muted-foreground ml-1.5">재고 {product.stock}개</span>
+                                </div>
+                                <button
+                                  onClick={() => handlePurchase(product)}
+                                  className="px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold"
+                                >
+                                  구매하기
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-3 mt-1 border-t border-border">
+                    <span className="text-sm text-muted-foreground">보유 코인</span>
+                    <span className="font-semibold text-foreground">{balance.toLocaleString()} C</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </>

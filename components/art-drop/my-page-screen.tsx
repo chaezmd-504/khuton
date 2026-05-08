@@ -1,23 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronRight, Coins, Award, Bookmark } from "lucide-react"
+import { ChevronRight, Coins, Award, Bookmark, ShoppingBag } from "lucide-react"
 import Image from "next/image"
 import { CoinChargeSheet } from "./coin-charge-sheet"
 import { GalleryScreen } from "./gallery-screen"
 import { CertificatesScreen } from "./certificates-screen"
 import { SavedWorksScreen } from "./saved-works-screen"
+import { OrderHistoryScreen } from "./order-history-screen"
 import { useCoinStore } from "@/store/coin-store"
 import { useArchiveStore } from "@/store/archive-store"
+import { useOrderStore } from "@/store/order-store"
 
 export function MyPageScreen() {
   const { balance, addCoin, dropCount, totalSpent } = useCoinStore()
   const { archivedIds } = useArchiveStore()
+  const { orders } = useOrderStore()
 
   const [showChargeSheet, setShowChargeSheet] = useState(false)
   const [showGallery, setShowGallery] = useState(false)
   const [showCertificates, setShowCertificates] = useState(false)
   const [showSavedWorks, setShowSavedWorks] = useState(false)
+  const [showOrderHistory, setShowOrderHistory] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
   const showToast = (msg: string) => {
@@ -41,6 +45,10 @@ export function MyPageScreen() {
 
   if (showSavedWorks) {
     return <SavedWorksScreen onBack={() => setShowSavedWorks(false)} />
+  }
+
+  if (showOrderHistory) {
+    return <OrderHistoryScreen onBack={() => setShowOrderHistory(false)} />
   }
 
   return (
@@ -155,6 +163,28 @@ export function MyPageScreen() {
               <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-semibold">
                 {archivedIds.size}
               </span>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </div>
+          </button>
+
+          {/* Order history */}
+          <button
+            onClick={() => setShowOrderHistory(true)}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-card hover:bg-card/80 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+              <ShoppingBag className="w-6 h-6 text-amber-500" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="font-semibold text-foreground">주문 내역</p>
+              <p className="text-sm text-muted-foreground">상품 구매 내역 및 배송 현황</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {orders.length > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-xs font-semibold">
+                  {orders.length}
+                </span>
+              )}
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </div>
           </button>
