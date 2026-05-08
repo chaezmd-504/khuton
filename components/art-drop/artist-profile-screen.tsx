@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { ArrowLeft, MoreHorizontal, Grid3x3, Play } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSubscribeStore } from "@/store/subscribe-store"
 
 interface ArtistWork {
   id: string
@@ -121,7 +122,8 @@ interface ArtistProfileScreenProps {
 
 export function ArtistProfileScreen({ artistId, onBack, onOpenDM }: ArtistProfileScreenProps) {
   const artist = mockArtistData[artistId]
-  const [isSubscribed, setIsSubscribed] = useState(artist?.isSubscribed ?? false)
+  const { toggleSubscribe, isSubscribed } = useSubscribeStore()
+  const subscribed = isSubscribed(artistId)
   const [activeTab, setActiveTab] = useState<"grid" | "reels">("grid")
 
   if (!artist) {
@@ -193,15 +195,15 @@ export function ArtistProfileScreen({ artistId, onBack, onOpenDM }: ArtistProfil
           {/* Action buttons */}
           <div className="mt-4 flex gap-2">
             <button
-              onClick={() => setIsSubscribed(!isSubscribed)}
+              onClick={() => toggleSubscribe(artistId)}
               className={cn(
-                "flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all",
-                isSubscribed
-                  ? "bg-muted text-muted-foreground border border-border"
-                  : "bg-primary text-primary-foreground"
+                "flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border",
+                subscribed
+                  ? "border-primary text-primary bg-transparent"
+                  : "bg-primary text-primary-foreground border-primary"
               )}
             >
-              {isSubscribed ? "구독중" : "구독하기"}
+              {subscribed ? "구독중" : "구독하기"}
             </button>
             <button
               onClick={() => onOpenDM(artistId)}
