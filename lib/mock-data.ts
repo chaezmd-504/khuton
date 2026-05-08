@@ -5,6 +5,9 @@ export type Category =
   | "illustration"
   | "ceramics"
   | "intangible"
+  | "music"        
+  | "stationery"  
+  | "fashion"    
 
 export interface Product {
   id: string
