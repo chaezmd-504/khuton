@@ -15,14 +15,11 @@ function FeedContent() {
   const raw = searchParams.get("index")
   const initialIndex = raw !== null && !isNaN(Number(raw)) ? Number(raw) : 0
 
-  const [coins, setCoins] = useState(12500)
   const [artistId, setArtistId] = useState<string | null>(null)
   const [dmArtistId, setDmArtistId] = useState<string | null>(null)
 
   const handleTabChange = (tab: Tab) => {
-    if (tab === "home") router.push("/")
-    else if (tab === "subscription") router.push("/subscription")
-    else if (tab === "my") router.push("/my")
+    router.push("/")
   }
 
   if (dmArtistId) {
@@ -43,8 +40,6 @@ function FeedContent() {
         ) : (
           <FeedScreen
             initialIndex={initialIndex}
-            coins={coins}
-            onCoinsChange={setCoins}
             onArtistClick={(id) => setArtistId(id)}
             onOpenDM={(id) => setDmArtistId(id)}
           />

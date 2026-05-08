@@ -32,7 +32,6 @@ export default function ArtDropApp() {
   }, [router])
 
   const [activeTab, setActiveTab] = useState<TabType>("home")
-  const [coins, setCoins] = useState(12500)
   const [selectedArtistId, setSelectedArtistId] = useState<string | null>(null)
   const [dmArtistId, setDmArtistId] = useState<string | null>(null)
 
@@ -81,8 +80,6 @@ export default function ArtDropApp() {
             
             {activeTab === "feed" && (
               <FeedScreen
-                coins={coins}
-                onCoinsChange={setCoins}
                 onArtistClick={handleArtistClick}
                 onOpenDM={handleOpenDM}
               />
@@ -93,10 +90,7 @@ export default function ArtDropApp() {
             )}
             
             {activeTab === "my" && (
-              <MyPageScreen
-                coins={coins}
-                onCoinsChange={setCoins}
-              />
+              <MyPageScreen />
             )}
           </>
         )}

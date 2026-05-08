@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/recharts/package.json'\\).version\\)\")",
+      "Bash(node -e \"const r = require\\('recharts'\\); console.log\\(Object.keys\\(r\\).filter\\(k => k.includes\\('Tooltip'\\) || k.includes\\('Payload'\\)\\)\\)\")",
+      "Bash(node -e \"const r = require\\('react-resizable-panels'\\); console.log\\(Object.keys\\(r\\)\\)\")"
+    ]
+  }
+}

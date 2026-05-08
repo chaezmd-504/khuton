@@ -116,7 +116,7 @@ export function CoinChargeSheet({ currentCoins, onClose, onCharge }: CoinChargeS
                     {Icon ? (
                       <Icon className="w-6 h-6 text-muted-foreground" />
                     ) : (
-                      <span className="text-2xl">{method.icon}</span>
+                      <span className="text-2xl">{method.icon as string}</span>
                     )}
                     <span className="font-medium text-foreground">{method.label}</span>
                     {selectedPayment === method.id && (

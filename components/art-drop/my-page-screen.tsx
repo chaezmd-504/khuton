@@ -7,13 +7,10 @@ import { CoinChargeSheet } from "./coin-charge-sheet"
 import { GalleryScreen } from "./gallery-screen"
 import { CertificatesScreen } from "./certificates-screen"
 import { SavedWorksScreen } from "./saved-works-screen"
+import { useCoinStore } from "@/store/coin-store"
 
-interface MyPageScreenProps {
-  coins: number
-  onCoinsChange: (newCoins: number) => void
-}
-
-export function MyPageScreen({ coins, onCoinsChange }: MyPageScreenProps) {
+export function MyPageScreen() {
+  const { balance, addCoin } = useCoinStore()
   const [showChargeSheet, setShowChargeSheet] = useState(false)
   const [showGallery, setShowGallery] = useState(false)
   const [showCertificates, setShowCertificates] = useState(false)
@@ -95,7 +92,7 @@ export function MyPageScreen({ coins, onCoinsChange }: MyPageScreenProps) {
             </div>
             <div className="flex-1 text-left">
               <p className="font-semibold text-foreground">코인 충전</p>
-              <p className="text-sm text-muted-foreground">현재 잔액: {coins.toLocaleString()} C</p>
+              <p className="text-sm text-muted-foreground">현재 잔액: {balance.toLocaleString()} C</p>
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </button>
@@ -164,10 +161,10 @@ export function MyPageScreen({ coins, onCoinsChange }: MyPageScreenProps) {
       {/* Coin charge sheet */}
       {showChargeSheet && (
         <CoinChargeSheet
-          currentCoins={coins}
+          currentCoins={balance}
           onClose={() => setShowChargeSheet(false)}
           onCharge={(amount) => {
-            onCoinsChange(coins + amount)
+            addCoin(amount)
             setShowChargeSheet(false)
           }}
         />
