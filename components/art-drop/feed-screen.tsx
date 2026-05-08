@@ -47,7 +47,6 @@ interface FeedScreenProps {
 export function FeedScreen({ initialIndex = 0, coins, onCoinsChange, onArtistClick, onOpenDM }: FeedScreenProps) {
   const safeIndex = initialIndex >= 0 && initialIndex < REELS.length ? initialIndex : 0
   const [currentIndex, setCurrentIndex] = useState(safeIndex)
-  const [isPlaying, setIsPlaying] = useState(true)
   const [showDropSheet, setShowDropSheet] = useState(false)
   const [savedVideos, setSavedVideos] = useState<Set<string>>(new Set())
   const [dropAnimation, setDropAnimation] = useState(false)
@@ -133,33 +132,28 @@ export function FeedScreen({ initialIndex = 0, coins, onCoinsChange, onArtistCli
       {/* Video container */}
       <div
         ref={containerRef}
-        className="relative h-full w-full max-w-[375px] mx-auto"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onClick={() => setIsPlaying((p) => !p)}
+        className="relative h-full w-full max-w-[375px] mx-auto overflow-hidden"
       >
-        {/* Thumbnail background */}
-        <div className="absolute inset-0">
-          <Image
-            src={reel.thumbnailUrl}
-            alt={reel.title}
-            fill
-            className="object-cover"
-            priority
-            unoptimized
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
-        </div>
+        {/* YouTube iframe — key forces remount on index change */}
+        <iframe
+          key={currentIndex}
+          src={`https://www.youtube.com/embed/${reel.videoId}?autoplay=1&mute=1&loop=1&controls=0&playlist=${reel.videoId}&rel=0&playsinline=1`}
+          className="absolute inset-0 w-full h-full"
+          allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          style={{ border: "none", pointerEvents: "none" }}
+        />
 
-        {/* Play/Pause indicator */}
-        {!isPlaying && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 animate-fade-in">
-            <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <div className="w-0 h-0 border-t-[15px] border-t-transparent border-l-[25px] border-l-white border-b-[15px] border-b-transparent ml-2" />
-            </div>
-          </div>
-        )}
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none" />
+
+        {/* Touch-capture layer — sits above iframe, below buttons */}
+        <div
+          className="absolute inset-0 z-10"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        />
 
         {/* Right action bar */}
         <div className="absolute right-3 bottom-4 z-20 flex flex-col items-center gap-4">
