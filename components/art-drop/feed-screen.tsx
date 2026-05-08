@@ -81,7 +81,7 @@ export function FeedScreen({ initialIndex = 0, onArtistClick, onOpenDM }: FeedSc
   const [toast, setToast] = useState<string | null>(null)
 
   // ── stores ──
-  const { balance, deductCoin } = useCoinStore()
+  const { balance, deductCoin, addDroppedReel } = useCoinStore()
   const { toggleArchive, isArchived } = useArchiveStore()
 
   const reel            = REELS[currentIndex]
@@ -140,6 +140,7 @@ export function FeedScreen({ initialIndex = 0, onArtistClick, onOpenDM }: FeedSc
       showToast("코인이 부족해요 💰")
       return
     }
+    addDroppedReel(reel.id, effectiveDrop)
     const added = (effectiveDrop / reel.fundingGoal) * 100
     setFundingOverrides((prev) => ({
       ...prev,
