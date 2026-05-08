@@ -174,7 +174,7 @@ export const ARTISTS: Artist[] = [
     id: "a15",
     name: "스톤메이커",
     handle: "@stonemaker",
-    avatarUrl: "https://i.pravatar.cc/150?img=15",
+    avatarUrl: "/puppy.jpg",
     bio: "불안을 덜어주는 워리스톤을 만듭니다. 손끝에서 느껴지는 매끄러운 평온함을 선물하세요.",
     followers: 8200,
   },
