@@ -11,11 +11,23 @@ import { OrderHistoryScreen } from "./order-history-screen"
 import { useCoinStore } from "@/store/coin-store"
 import { useArchiveStore } from "@/store/archive-store"
 import { useOrderStore } from "@/store/order-store"
+import { useSubscribeStore } from "@/store/subscribe-store"
+import { ALL_BADGES, getEarnedBadgeIds } from "@/lib/badges"
 
 export function MyPageScreen() {
   const { balance, addCoin, dropCount, totalSpent } = useCoinStore()
   const { archivedIds } = useArchiveStore()
   const { orders } = useOrderStore()
+  const { subscribedIds } = useSubscribeStore()
+
+  const earnedBadgeIds = getEarnedBadgeIds({
+    isLoggedIn: true,
+    dropCount,
+    totalSpent,
+    archivedCount: archivedIds.size,
+    orderCount: orders.length,
+    subscribedCount: subscribedIds.size,
+  })
 
   const [showChargeSheet, setShowChargeSheet] = useState(false)
   const [showGallery, setShowGallery] = useState(false)
@@ -91,6 +103,45 @@ export function MyPageScreen() {
               <p className="text-xl font-bold text-foreground">{orders.length}</p>
               <p className="text-xs text-muted-foreground mt-1">주문 내역</p>
             </button>
+          </div>
+        </div>
+
+        {/* Badge section */}
+        <div className="mt-2 px-4">
+          <div className="bg-card rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-foreground text-sm">나의 배지</h3>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                style={{ backgroundColor: "rgba(255,133,161,0.15)", color: "#FF85A1" }}>
+                {earnedBadgeIds.size} / {ALL_BADGES.length} 획득
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {ALL_BADGES.map((badge) => {
+                const earned = earnedBadgeIds.has(badge.id)
+                return (
+                  <div
+                    key={badge.id}
+                    className="flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl transition-all"
+                    style={{
+                      backgroundColor: earned ? "rgba(255,133,161,0.1)" : "#F3F4F6",
+                      opacity: earned ? 1 : 0.45,
+                    }}
+                    title={earned ? badge.desc : badge.hint}
+                  >
+                    <span style={{ fontSize: "1.5rem", lineHeight: 1, filter: earned ? "none" : "grayscale(1)" }}>
+                      {badge.emoji}
+                    </span>
+                    <span
+                      className="text-[9px] font-semibold text-center leading-tight"
+                      style={{ color: earned ? "#FF85A1" : "#9CA3AF" }}
+                    >
+                      {badge.name}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
 
