@@ -166,7 +166,7 @@ export function HomeScreen() {
                       className="px-3 py-1.5 text-xs font-semibold transition-all"
                       style={{
                         borderRadius: "999px",
-                        backgroundColor: isActive ? "#7C3AED" : "#1A1A1A",
+                        backgroundColor: isActive ? "#FFB6C1" : "#1A1A1A",
                         color: isActive ? "#FFFFFF" : "#9CA3AF",
                       }}
                     >
@@ -178,7 +178,7 @@ export function HomeScreen() {
               <button
                 onClick={() => setShowChipEditor(false)}
                 className="mt-2 text-xs font-medium"
-                style={{ color: "#7C3AED" }}
+                style={{ color: "#FFB6C1" }}
               >
                 접기
               </button>
@@ -192,7 +192,7 @@ export function HomeScreen() {
                   className="px-3 py-1.5 text-xs font-semibold"
                   style={{
                     borderRadius: "999px",
-                    backgroundColor: "#7C3AED",
+                    backgroundColor: "#FFB6C1",
                     color: "#FFFFFF",
                   }}
                 >
@@ -235,7 +235,7 @@ export function HomeScreen() {
                       onClick={() => handleSortSelect(opt.id)}
                       className="w-full px-4 py-2.5 text-xs text-left transition-colors hover:bg-muted"
                       style={{
-                        color: sortType === opt.id ? "#7C3AED" : undefined,
+                        color: sortType === opt.id ? "#FFB6C1" : undefined,
                         fontWeight: sortType === opt.id ? 600 : 400,
                       }}
                     >

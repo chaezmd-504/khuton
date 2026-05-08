@@ -8,12 +8,14 @@ import logoSrc from "@/lib/logo.png"
 import { CATEGORY_OPTIONS, type Category } from "@/lib/mock-data"
 
 type Step = 1 | 2
+type MemberType = "individual" | "corporate" | null
 
 export default function SignupPage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>(1)
 
   // Step 1 fields
+  const [memberType, setMemberType] = useState<MemberType>(null)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -25,7 +27,8 @@ export default function SignupPage() {
 
   const handleStep1 = () => {
     setError("")
-    if (!name.trim()) { setError("이름을 입력해주세요"); return }
+    if (!memberType) { setError("회원 유형을 선택해주세요"); return }
+    if (!name.trim()) { setError(memberType === "corporate" ? "기업명을 입력해주세요" : "이름을 입력해주세요"); return }
     if (!email.trim() || !email.includes("@")) { setError("올바른 이메일 형식을 입력해주세요"); return }
     if (password.length < 6) { setError("비밀번호는 6자 이상이어야 해요"); return }
     setStep(2)
@@ -39,7 +42,7 @@ export default function SignupPage() {
 
   const handleSignup = () => {
     if (selected.length === 0) return
-    localStorage.setItem("art-drop-user", JSON.stringify({ name: name.trim(), email }))
+    localStorage.setItem("art-drop-user", JSON.stringify({ name: name.trim(), email, memberType }))
     localStorage.setItem("art-drop-preferences", JSON.stringify(selected))
     router.push("/")
   }
@@ -74,14 +77,48 @@ export default function SignupPage() {
             <p className="text-sm text-gray-400 mb-6">Art-Drop에 오신 걸 환영해요</p>
 
             <div className="flex flex-col gap-4">
+              {/* Member type selector */}
               <div>
-                <label className="text-xs font-medium text-gray-500 mb-1.5 block">이름</label>
+                <label className="text-xs font-medium text-gray-500 mb-1.5 block">회원 유형</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: "individual" as MemberType, emoji: "🧑‍🎨", title: "개인 회원", desc: "작품을 후원하는\n개인 사용자" },
+                    { id: "corporate" as MemberType, emoji: "🏢", title: "기업 회원", desc: "아트 협찬·투자를\n원하는 기업" },
+                  ].map((opt) => {
+                    const isSelected = memberType === opt.id
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setMemberType(opt.id)}
+                        className="flex flex-col items-center gap-1.5 py-4 rounded-xl transition-all text-center"
+                        style={{
+                          backgroundColor: isSelected ? "rgba(255,133,161,0.08)" : "#F9FAFB",
+                          border: isSelected ? "2px solid #FF85A1" : "1px solid #E5E7EB",
+                        }}
+                      >
+                        <span className="text-2xl">{opt.emoji}</span>
+                        <span className="text-sm font-bold text-gray-800">{opt.title}</span>
+                        <span className="text-[10px] text-gray-400 whitespace-pre-line leading-snug">{opt.desc}</span>
+                        {isSelected && (
+                          <div className="absolute" style={{ display: "none" }} />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+                  {memberType === "corporate" ? "기업명" : "이름"}
+                </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleStep1()}
-                  placeholder="홍길동"
+                  placeholder={memberType === "corporate" ? "아트컴퍼니 주식회사" : "홍길동"}
                   className="w-full h-12 px-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent"
                 />
               </div>
