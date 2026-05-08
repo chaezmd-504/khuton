@@ -1,5 +1,4 @@
 import { create } from "zustand"
-import { ARTISTS } from "@/lib/mock-data"
 
 interface SubscribeStore {
   subscribedIds: Set<string>
@@ -7,7 +6,7 @@ interface SubscribeStore {
   isSubscribed: (handle: string) => boolean
 }
 
-const initialSubscribed = new Set(ARTISTS.slice(0, 3).map((a) => a.handle))
+const initialSubscribed = new Set<string>()
 
 export const useSubscribeStore = create<SubscribeStore>((set, get) => ({
   subscribedIds: initialSubscribed,

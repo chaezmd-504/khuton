@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { ArrowLeft, Send, ImageIcon, MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ARTISTS } from "@/lib/mock-data"
 
 interface Message {
   id: string
@@ -12,39 +13,9 @@ interface Message {
   timestamp: string
 }
 
-interface ArtistInfo {
-  artistId: string
-  artistName: string
-  profileImage: string
-}
-
-const mockArtistInfo: Record<string, ArtistInfo> = {
-  "@minjun_art": {
-    artistId: "@minjun_art",
-    artistName: "민준",
-    profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-  },
-  "@soyeon.draws": {
-    artistId: "@soyeon.draws",
-    artistName: "소연",
-    profileImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-  },
-  "@leehyun_studio": {
-    artistId: "@leehyun_studio",
-    artistName: "이현",
-    profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-  },
-  "@park.illust": {
-    artistId: "@park.illust",
-    artistName: "박일러스트",
-    profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-  },
-  "@jiwon.ceramic": {
-    artistId: "@jiwon.ceramic",
-    artistName: "지원 세라믹",
-    profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
-  },
-}
+const artistInfoMap = Object.fromEntries(
+  ARTISTS.map((a) => [a.handle, { artistId: a.handle, artistName: a.name, profileImage: a.avatarUrl }])
+)
 
 interface DMChatScreenProps {
   artistId: string
@@ -52,7 +23,7 @@ interface DMChatScreenProps {
 }
 
 export function DMChatScreen({ artistId, onBack }: DMChatScreenProps) {
-  const artist = mockArtistInfo[artistId]
+  const artist = artistInfoMap[artistId]
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
